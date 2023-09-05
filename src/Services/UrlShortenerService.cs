@@ -5,18 +5,39 @@ public sealed class UrlShortenerService : IUrlShortenerService
     private readonly UrlShortenerSetting _shortenerSetting;
     private readonly ITagRepository _linkRepository;
     private readonly IMemoryCache _cache;
+    private readonly IShortCodeHandler _shortCodeHandler;
 
     private Dictionary<string, string> shortToLongUrlMap;
 
     public UrlShortenerService(
         IOptions<UrlShortenerSetting> shortenerSettingOptions,
         ITagRepository linkRepository,
-        IMemoryCache cache)
+        IMemoryCache cache,
+        IShortCodeHandler shortCodeHandler)
     {
         _shortenerSetting = shortenerSettingOptions.Value;
         shortToLongUrlMap = new Dictionary<string, string>();
         _linkRepository = linkRepository;
         _cache = cache;
+        _shortCodeHandler = shortCodeHandler;
+    }
+
+    public async Task<string> ShortenUrlAsync(string longUrl, CancellationToken cancellationToken)
+    {
+        var getUrlResult = await TryGetShortUrlAsync(longUrl, cancellationToken);
+        if (getUrlResult.found)
+        {
+            return UrlResponseCombination(getUrlResult.value!);
+        }
+
+        var shortCode = await _shortCodeHandler.GenerateAsync(longUrl, _shortenerSetting.ShortCodeLength);
+
+        var link = Tag.Create(shortCode, longUrl);
+        await _linkRepository.AddAsync(link, cancellationToken);
+        await _linkRepository.SaveChangesAsync(cancellationToken);
+
+        SetCacheEntry(shortCode, longUrl);
+        return UrlResponseCombination(shortCode);
     }
 
     public async Task<(bool found, string? value)> TryGetLongUrlAsync(string shortCode,
@@ -53,45 +74,6 @@ public sealed class UrlShortenerService : IUrlShortenerService
         }
 
         return (false, null);
-    }
-
-    public async Task<string> ShortenUrlAsync(string longUrl, CancellationToken cancellationToken)
-    {
-        var getUrlResult = await TryGetShortUrlAsync(longUrl, cancellationToken);
-        if (getUrlResult.found)
-        {
-            return UrlResponseCombination(getUrlResult.value!);
-        }
-
-        var shortCode = GenerateShortCode(longUrl);
-
-        var link = Tag.Create(shortCode, longUrl);
-        await _linkRepository.AddAsync(link, cancellationToken);
-        await _linkRepository.SaveChangesAsync(cancellationToken);
-
-        SetCacheEntry(shortCode, longUrl);
-        return UrlResponseCombination(shortCode);
-    }
-
-    private string GenerateShortCode(string longUrl)
-    {
-        using (MD5 md5 = MD5.Create())
-        {
-            byte[] hashBytes = md5.ComputeHash(Encoding.UTF8.GetBytes(longUrl));
-            string hashCode = BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
-
-            for (int i = 0; i <= hashCode.Length - _shortenerSetting.ShortCodeLength; i++)
-            {
-                string candidateCode = hashCode.Substring(i, _shortenerSetting.ShortCodeLength);
-
-                if (!shortToLongUrlMap.ContainsKey(candidateCode))
-                {
-                    return candidateCode;
-                }
-            }
-
-            throw new Exception(Constants.Data.ExceptionMessage.FailedGenerateUniqCode);
-        }
     }
 
     private void SetCacheEntry(string shortCode, string longUrl)
