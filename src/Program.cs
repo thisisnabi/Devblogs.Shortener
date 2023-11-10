@@ -1,6 +1,10 @@
 WebApplication.CreateBuilder(args)
-              .AddInstallers()
-              .Build()
+              .BuildIt()
               .MapEndpoints()
               .Run();
+
+
+
+
+
 

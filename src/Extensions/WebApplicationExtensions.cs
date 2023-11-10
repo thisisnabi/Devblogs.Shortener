@@ -2,10 +2,10 @@
 
 public static class WebApplicationExtensions
 {
-    public static WebApplicationBuilder AddInstallers(this WebApplicationBuilder builder)
+    public static WebApplication BuildIt(this WebApplicationBuilder builder)
     {
         builder.Services.InstallFromAssembly<IShortenerAssemblyMarker>(builder.Configuration);
-        return builder;
+        return builder.Build();
     }
 
     public static WebApplication MapEndpoints(this WebApplication app)
