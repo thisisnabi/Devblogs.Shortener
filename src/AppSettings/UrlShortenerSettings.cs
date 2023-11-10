@@ -1,6 +1,6 @@
 ﻿namespace Devblogs.Shortener.AppSettings;
 
-public class UrlShortenerSetting
+public class UrlShortenerSettings
 {
     public const string SectionName = "UrlShortener";
 
