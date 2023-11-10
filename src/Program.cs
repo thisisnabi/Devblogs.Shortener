@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Configuration;
+using System;
 
 var builder = WebApplication.CreateBuilder(args);
 {
@@ -19,11 +20,11 @@ var app = builder.Build();
         IUrlShortenerService urlShortenerService, 
         CancellationToken cancellationToken) =>
     {
-        var foundUrlResult = await urlShortenerService.TryGetLongUrlAsync(shortCode, cancellationToken);
+        var longUrl = await urlShortenerService.GetLongUrlAsync(shortCode, cancellationToken);
 
-        if (foundUrlResult.found)
+        if (longUrl.Found())
         {
-            return Results.Redirect(foundUrlResult.value!);
+            return Results.Redirect(longUrl!);
         }
 
         return Results.BadRequest(Constants.Data.EndPointFilterMessages.InvalidUrl);
