@@ -7,3 +7,7 @@ Content-Type: Application/json
   "Url":"https://www.youtube.com/watch?v=Yg-OdFntHYs"
 }
 ###
+
+GET {{Devblogs.Shortener_HostAddress}}/84a243ff
+
+###

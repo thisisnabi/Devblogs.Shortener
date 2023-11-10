@@ -21,14 +21,14 @@ public class TagRepository(ShortenerDbContext shortenerDbContext, IMemoryCache m
         }
          
         var tag = await _shortenerDbContext.Tags.FirstOrDefaultAsync(x => x.ShortCode == shortCode, cancellationToken);
-        return tag?.LongUrl ?? null;
+        return tag?.LongUrl;
     }
 
-    public async Task<string?> GetShortUrlAsync(string longUrl, CancellationToken cancellationToken)
+    public async Task<string?> GetShortCodeAsync(string longUrl, CancellationToken cancellationToken)
     {
         var tag = await _shortenerDbContext.Tags.FirstOrDefaultAsync(x => x.LongUrl == longUrl, cancellationToken);
         
-        return tag?.LongUrl ?? null;
+        return tag?.ShortCode;
     }
        
     public async Task<bool> IsShortCodeUsedAsync(string candidateCode, CancellationToken cancellationToken)

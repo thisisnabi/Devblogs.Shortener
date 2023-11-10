@@ -6,7 +6,7 @@ public interface ITagRepository
 
     Task<string?> GetLongUrlAsync(string shortCode, CancellationToken cancellationToken);
 
-    Task<string?> GetShortUrlAsync(string longUrl, CancellationToken cancellationToken);
+    Task<string?> GetShortCodeAsync(string longUrl, CancellationToken cancellationToken);
  
     Task<bool> IsShortCodeUsedAsync(string candidateCode, CancellationToken cancellationToken);
 }

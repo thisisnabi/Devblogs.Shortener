@@ -14,7 +14,7 @@ public sealed class UrlShortenerService(
 
     public async Task<string> ShortenUrlAsync(string longUrl, CancellationToken cancellationToken)
     {
-        var shortCode = await _tagRepository.GetShortUrlAsync(longUrl, cancellationToken);
+        var shortCode = await _tagRepository.GetShortCodeAsync(longUrl, cancellationToken);
         if (shortCode.Found())
         {
             return GenerateUrl(shortCode!);
