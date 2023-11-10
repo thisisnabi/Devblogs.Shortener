@@ -1,11 +1,6 @@
-using Microsoft.Extensions.Configuration;
-using System;
-
-var builder = WebApplication.CreateBuilder(args);
-{
-    builder.Services.InstallFromAssembly<IShortenerAssemblyMarker>(builder.Configuration);
-}
-
+var builder = WebApplication.CreateBuilder(args)
+                            .InstallExtensions();
+ 
 var app = builder.Build();
 {
     app.MapPost("/shorten", async ([FromBody] ShortenRequest request,
@@ -17,7 +12,7 @@ var app = builder.Build();
     }).AddEndpointFilter<ShortenEndpointFilter>();
 
     app.MapGet("{shortCode}", async ([FromRoute] string shortCode,
-        IUrlShortenerService urlShortenerService, 
+        IUrlShortenerService urlShortenerService,
         CancellationToken cancellationToken) =>
     {
         var longUrl = await urlShortenerService.GetLongUrlAsync(shortCode, cancellationToken);

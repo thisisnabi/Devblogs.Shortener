@@ -1,0 +1,9 @@
+﻿@Devblogs.Shortener_HostAddress = https://localhost:7144
+
+POST {{Devblogs.Shortener_HostAddress}}/shorten
+Content-Type: Application/json
+
+{
+  "Url":"https://www.youtube.com/watch?v=Yg-OdFntHYs"
+}
+###
