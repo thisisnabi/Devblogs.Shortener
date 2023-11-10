@@ -2,11 +2,11 @@
 
 public class RedirectEndpointFilter : IEndpointFilter
 {
-    private readonly UrlShortenerSetting _setting;
+    private readonly UrlShortenerSettings _setting;
     private const int UrlArgumentIndex = 0;
     private const string ValidArgumentRegexPattern = @"^[a-zA-Z0-9-]+$";
 
-    public RedirectEndpointFilter(IOptions<UrlShortenerSetting> settingOption)
+    public RedirectEndpointFilter(IOptions<UrlShortenerSettings> settingOption)
     {
         _setting = settingOption.Value;
     }

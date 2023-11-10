@@ -10,7 +10,7 @@ var app = builder.Build();
         IUrlShortenerService urlShortenerService,
         CancellationToken cancellationToken) =>
     {
-        var shortUrl = await urlShortenerService.ShortenUrlAsync(request.url, cancellationToken);
+        var shortUrl = await urlShortenerService.ShortenUrlAsync(request.Url, cancellationToken);
         return Results.Ok(new { ShortUrl = shortUrl });
     }).AddEndpointFilter<ShortenEndpointFilter>();
 

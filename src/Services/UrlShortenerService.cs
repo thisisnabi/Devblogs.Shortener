@@ -2,7 +2,7 @@
 
 public sealed class UrlShortenerService : IUrlShortenerService
 {
-    private readonly UrlShortenerSetting _shortenerSetting;
+    private readonly UrlShortenerSettings _shortenerSetting;
     private readonly ITagRepository _linkRepository;
     private readonly IMemoryCache _cache;
     private readonly IShortCodeHandler _shortCodeHandler;
@@ -10,7 +10,7 @@ public sealed class UrlShortenerService : IUrlShortenerService
     private Dictionary<string, string> shortToLongUrlMap;
 
     public UrlShortenerService(
-        IOptions<UrlShortenerSetting> shortenerSettingOptions,
+        IOptions<UrlShortenerSettings> shortenerSettingOptions,
         ITagRepository linkRepository,
         IMemoryCache cache,
         IShortCodeHandler shortCodeHandler)

@@ -1,6 +1,6 @@
 ﻿namespace Devblogs.Shortener.Installers;
 
-public class ApplicationDbContextInstaller : IServiceCollectionInstaller
+public class ShortenerDbContextInstaller : IServiceCollectionInstaller
 {
     public void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
