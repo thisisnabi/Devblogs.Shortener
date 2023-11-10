@@ -1,26 +1,15 @@
 ﻿namespace Devblogs.Shortener.Services;
 
-public sealed class UrlShortenerService : IUrlShortenerService
-{
-    private readonly UrlShortenerSettings _shortenerSetting;
-    private readonly ITagRepository _linkRepository;
-    private readonly IMemoryCache _cache;
-    private readonly IShortCodeHandler _shortCodeHandler;
-
-    private Dictionary<string, string> shortToLongUrlMap;
-
-    public UrlShortenerService(
+public sealed class UrlShortenerService(
         IOptions<UrlShortenerSettings> shortenerSettingOptions,
         ITagRepository linkRepository,
         IMemoryCache cache,
-        IShortCodeHandler shortCodeHandler)
-    {
-        _shortenerSetting = shortenerSettingOptions.Value;
-        shortToLongUrlMap = new Dictionary<string, string>();
-        _linkRepository = linkRepository;
-        _cache = cache;
-        _shortCodeHandler = shortCodeHandler;
-    }
+        IShortCodeHandler shortCodeHandler) : IUrlShortenerService
+{
+    private readonly UrlShortenerSettings _shortenerSetting = shortenerSettingOptions.Value;
+    private readonly ITagRepository _linkRepository = linkRepository;
+    private readonly IMemoryCache _cache = cache;
+    private readonly IShortCodeHandler _shortCodeHandler = shortCodeHandler;
 
     public async Task<string> ShortenUrlAsync(string longUrl, CancellationToken cancellationToken)
     {

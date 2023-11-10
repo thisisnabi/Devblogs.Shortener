@@ -1,12 +1,8 @@
 ﻿namespace Devblogs.Shortener.Handlers;
 
-public class ShortCodeHandler : IShortCodeHandler
+public class ShortCodeHandler(ITagRepository tagRepository) : IShortCodeHandler
 {
-    private readonly ITagRepository _tagRepository;
-    public ShortCodeHandler(ITagRepository tagRepository)
-    {
-        _tagRepository = tagRepository;
-    }
+    private readonly ITagRepository _tagRepository = tagRepository;
 
     public async Task<string> GenerateAsync(string longUrl, int length)
     {

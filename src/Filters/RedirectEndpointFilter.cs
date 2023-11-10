@@ -1,15 +1,10 @@
 ﻿namespace Devblogs.Shortener.Filters;
 
-public class RedirectEndpointFilter : IEndpointFilter
+public class RedirectEndpointFilter(IOptions<UrlShortenerSettings> settingOption) : IEndpointFilter
 {
-    private readonly UrlShortenerSettings _setting;
+    private readonly UrlShortenerSettings _setting = settingOption.Value;
     private const int UrlArgumentIndex = 0;
     private const string ValidArgumentRegexPattern = @"^[a-zA-Z0-9-]+$";
-
-    public RedirectEndpointFilter(IOptions<UrlShortenerSettings> settingOption)
-    {
-        _setting = settingOption.Value;
-    }
 
     public async ValueTask<object?> InvokeAsync(EndpointFilterInvocationContext context, EndpointFilterDelegate next)
     {

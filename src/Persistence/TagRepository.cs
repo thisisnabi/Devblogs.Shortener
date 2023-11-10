@@ -1,11 +1,8 @@
 ﻿namespace Devblogs.Shortener.Data;
 
-public class TagRepository : ITagRepository
+public class TagRepository(ShortenerDbContext shortenerDbContext) : ITagRepository
 {
-    private readonly ShortenerDbContext _shortenerDbContext;
-
-    public TagRepository(ShortenerDbContext shortenerDbContext)
-        => _shortenerDbContext = shortenerDbContext;
+    private readonly ShortenerDbContext _shortenerDbContext = shortenerDbContext;
 
     public async Task AddAsync(Tag tag, CancellationToken cancellationToken)
         => await _shortenerDbContext.Tags.AddAsync(tag, cancellationToken);

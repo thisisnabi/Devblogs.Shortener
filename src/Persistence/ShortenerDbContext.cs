@@ -1,16 +1,11 @@
 ﻿namespace Devblogs.Shortener.Data;
 
-public class ShortenerDbContext : DbContext
+public class ShortenerDbContext(DbContextOptions<ShortenerDbContext> dbContextOptions) 
+    : DbContext(dbContextOptions)
 {
     public const string DefaultSchema = "shortener";
     public const string ConnectionStringName = "SvcDbContext";
-
-    public ShortenerDbContext(DbContextOptions<ShortenerDbContext> dbContextOptions)
-        : base(dbContextOptions)
-    {
-
-    }
-
+     
     public DbSet<Tag> Tags => Set<Tag>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

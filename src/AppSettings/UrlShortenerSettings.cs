@@ -8,5 +8,5 @@ public class UrlShortenerSettings
 
     public required int ShortCodeLength { get; set; }
 
-    public int DefaultExpirationCachedTagOnDays { get; set; }
+    public required int DefaultExpirationCachedTagOnDays { get; set; } = 10;
 }
