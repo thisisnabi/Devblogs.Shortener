@@ -1,78 +1,44 @@
-﻿namespace Devblogs.Shortener.Services;
+﻿
+namespace Devblogs.Shortener.Services;
 
 public sealed class UrlShortenerService(
         IOptions<UrlShortenerSettings> shortenerSettingOptions,
-        ITagRepository linkRepository,
+        ITagRepository tagRepository,
         IMemoryCache cache,
-        IShortCodeHandler shortCodeHandler) : IUrlShortenerService
+        IShortCodeGenerator shortCodeGenerator) : IUrlShortenerService
 {
     private readonly UrlShortenerSettings _shortenerSetting = shortenerSettingOptions.Value;
-    private readonly ITagRepository _linkRepository = linkRepository;
+    private readonly ITagRepository _tagRepository = tagRepository;
     private readonly IMemoryCache _cache = cache;
-    private readonly IShortCodeHandler _shortCodeHandler = shortCodeHandler;
+    private readonly IShortCodeGenerator _shortCodeGenerator = shortCodeGenerator;
 
     public async Task<string> ShortenUrlAsync(string longUrl, CancellationToken cancellationToken)
     {
-        var getUrlResult = await TryGetShortUrlAsync(longUrl, cancellationToken);
-        if (getUrlResult.found)
+        var shortCode = await _tagRepository.GetShortUrlAsync(longUrl, cancellationToken);
+        if (shortCode.Found())
         {
-            return UrlResponseCombination(getUrlResult.value!);
+            return GenerateUrl(shortCode!);
         }
 
-        var shortCode = await _shortCodeHandler.GenerateAsync(longUrl, _shortenerSetting.ShortCodeLength);
+        string generatedCode = await _shortCodeGenerator.GenerateAsync(longUrl, cancellationToken);
 
-        var link = Tag.Create(shortCode, longUrl);
-        await _linkRepository.AddAsync(link, cancellationToken);
-        await _linkRepository.SaveChangesAsync(cancellationToken);
+        var tag = Tag.Create(generatedCode, longUrl);
+        await _tagRepository.InsertAsync(tag, cancellationToken);
 
-        SetCacheEntry(shortCode, longUrl);
-        return UrlResponseCombination(shortCode);
+        return GenerateUrl(generatedCode);
     }
 
-    public async Task<(bool found, string? value)> TryGetLongUrlAsync(string shortCode,
-        CancellationToken cancellationToken)
+    public async Task<string> GetLongUrlAsync(string shortCode, CancellationToken cancellationToken)
     {
-        if (_cache.TryGetValue(shortCode, out string? longUrl))
+        var longUrl = await _tagRepository.GetLongUrlAsync(shortCode, cancellationToken);
+        if (longUrl.Found())
         {
-            return (true, longUrl);
+            return longUrl!;
         }
 
-        var getTagResult = await _linkRepository.TryGetLongUrlAsync(shortCode, cancellationToken);
-        if (getTagResult.found)
-        {
-            SetCacheEntry(shortCode, getTagResult.value!);
-            return (true, getTagResult.value);
-        }
-
-        return (false, null);
+        throw new NullReferenceException(nameof(longUrl));
     }
-
-    public async Task<(bool found, string? value)> TryGetShortUrlAsync(string longUrl,
-        CancellationToken cancellationToken)
-    {
-        if (_cache.TryGetValue(longUrl, out string? shortCode))
-        {
-            return (true, shortCode);
-        }
-
-        var getShortTagResult = await _linkRepository.TryGetShortUrlAsync(longUrl, cancellationToken);
-        if (getShortTagResult.found)
-        {
-            SetCacheEntry(shortCode: getShortTagResult.value!, longUrl: longUrl);
-            return (true, getShortTagResult.value);
-        }
-
-        return (false, null);
-    }
-
-    private void SetCacheEntry(string shortCode, string longUrl)
-    {
-        _cache.Set(shortCode, longUrl,
-            TimeSpan.FromDays(_shortenerSetting.DefaultExpirationCachedTagOnDays));
-        _cache.Set(longUrl, shortCode,
-            TimeSpan.FromDays(_shortenerSetting.DefaultExpirationCachedTagOnDays));
-    }
-
-    private string UrlResponseCombination(string shortCode)
-        => $"{_shortenerSetting.BaseServiceUrl}/{shortCode}";
+ 
+    private string GenerateUrl(string shortCode)
+        => $"{_shortenerSetting.BaseUrl}/{shortCode}";
 }

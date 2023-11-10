@@ -2,9 +2,11 @@
 
 public interface ITagRepository
 {
-    Task AddAsync(Tag tag, CancellationToken cancellationToken);
-    Task<(bool found, string? value)> TryGetLongUrlAsync(string shortCode, CancellationToken cancellationToken);
-    Task<(bool found, string? value)> TryGetShortUrlAsync(string longUrl, CancellationToken cancellationToken);
-    Task<bool> SaveChangesAsync(CancellationToken cancellationToken);
-    Task<bool> HasCodeAsync(string candidateCode);
+    Task InsertAsync(Tag tag, CancellationToken cancellationToken);
+
+    Task<string?> GetLongUrlAsync(string shortCode, CancellationToken cancellationToken);
+
+    Task<string?> GetShortUrlAsync(string longUrl, CancellationToken cancellationToken);
+ 
+    Task<bool> IsShortCodeUsedAsync(string candidateCode, CancellationToken cancellationToken);
 }

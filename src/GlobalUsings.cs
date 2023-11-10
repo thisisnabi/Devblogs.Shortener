@@ -17,5 +17,6 @@ global using Devblogs.Shortener.Models;
 global using Devblogs.Shortener.Filters;
 global using Devblogs.Shortener.Contracts;
 global using Devblogs.Shortener.Services;
-global using Devblogs.Shortener.Handlers;
+global using Devblogs.Shortener.Extensions;
+
 

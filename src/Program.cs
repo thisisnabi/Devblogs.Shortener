@@ -1,7 +1,8 @@
+using Microsoft.Extensions.Configuration;
+
 var builder = WebApplication.CreateBuilder(args);
 {
     builder.Services.InstallFromAssembly<IShortenerAssemblyMarker>(builder.Configuration);
-    builder.Services.AddMemoryCache();
 }
 
 var app = builder.Build();

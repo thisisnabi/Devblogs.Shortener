@@ -4,9 +4,9 @@ public class UrlShortenerSettings
 {
     public const string SectionName = "UrlShortener";
 
-    public required string BaseServiceUrl { get; set; }
+    public required string BaseUrl { get; set; }
 
     public required int ShortCodeLength { get; set; }
 
-    public required int DefaultExpirationCachedTagOnDays { get; set; } = 10;
+    public required int DefaultExpirationCachedOnDays { get; set; } = 10;
 }

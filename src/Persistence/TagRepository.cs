@@ -1,45 +1,36 @@
 ﻿namespace Devblogs.Shortener.Data;
 
-public class TagRepository(ShortenerDbContext shortenerDbContext) : ITagRepository
+public class TagRepository(ShortenerDbContext shortenerDbContext, IMemoryCache memoryCache) : ITagRepository
 {
     private readonly ShortenerDbContext _shortenerDbContext = shortenerDbContext;
+    private readonly IMemoryCache _memoryCache = memoryCache;
 
-    public async Task AddAsync(Tag tag, CancellationToken cancellationToken)
-        => await _shortenerDbContext.Tags.AddAsync(tag, cancellationToken);
-
-    public async Task<(bool found, string? value)> TryGetLongUrlAsync(string shortCode, CancellationToken cancellationToken)
+    public async Task InsertAsync(Tag tag, CancellationToken cancellationToken)
     {
-        var tag = await _shortenerDbContext.Tags.FirstOrDefaultAsync(x => x.ShortCode == shortCode, cancellationToken);
+        await _shortenerDbContext.Tags.AddAsync(tag, cancellationToken);
+        _memoryCache.Set(tag.ShortCode, tag.LongUrl);
 
-        if (tag != null)
-        {
-            return (true, tag.LongUrl);
-        }
-
-        return (false, null);
+        await _shortenerDbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<(bool found, string? value)> TryGetShortUrlAsync(string longUrl, CancellationToken cancellationToken)
+    public async Task<string?> GetLongUrlAsync(string shortCode, CancellationToken cancellationToken)
+    {
+        if (_memoryCache.TryGetValue(shortCode,out string? longUrl))
+        {
+            return longUrl;
+        }
+         
+        var tag = await _shortenerDbContext.Tags.FirstOrDefaultAsync(x => x.ShortCode == shortCode, cancellationToken);
+        return tag?.LongUrl ?? null;
+    }
+
+    public async Task<string?> GetShortUrlAsync(string longUrl, CancellationToken cancellationToken)
     {
         var tag = await _shortenerDbContext.Tags.FirstOrDefaultAsync(x => x.LongUrl == longUrl, cancellationToken);
-
-        if (tag != null)
-        {
-            return (true, tag.ShortCode);
-        }
-
-        return (false, null);
+        
+        return tag?.LongUrl ?? null;
     }
-     
-    public async Task<bool> SaveChangesAsync(CancellationToken cancellationToken)
-        => await _shortenerDbContext.SaveChangesAsync(cancellationToken) > 0;
-
-    public async Task<bool> HasCodeAsync(string candidateCode)
-    {
-        // check cache
-
-        // check 
-
-        return false;
-    }
+       
+    public async Task<bool> IsShortCodeUsedAsync(string candidateCode, CancellationToken cancellationToken)
+        => !string.IsNullOrEmpty(await GetLongUrlAsync(candidateCode, cancellationToken));
 }

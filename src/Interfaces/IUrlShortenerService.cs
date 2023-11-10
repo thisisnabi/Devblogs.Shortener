@@ -3,5 +3,6 @@
 public interface IUrlShortenerService
 {
     Task<string> ShortenUrlAsync(string longUrl, CancellationToken cancellationToken);
-    Task<(bool found, string? value)> TryGetLongUrlAsync(string shortCode, CancellationToken cancellationToken);
+
+    Task<string> GetLongUrlAsync(string shortCode, CancellationToken cancellationToken);
 }

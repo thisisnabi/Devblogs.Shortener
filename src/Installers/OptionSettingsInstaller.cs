@@ -1,6 +1,6 @@
 ﻿namespace Devblogs.Services.Shortener.Installers;
 
-public sealed class SettingsInstaller : IServiceCollectionInstaller
+public sealed class OptionSettingsInstaller : IServiceCollectionInstaller
 {
     public void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {

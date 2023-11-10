@@ -5,6 +5,6 @@ public sealed class ServicesInstaller : IServiceCollectionInstaller
     public void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<IUrlShortenerService, UrlShortenerService>();
-        services.AddScoped<IShortCodeHandler, ShortCodeHandler>();
+        services.AddScoped<IShortCodeGenerator, ShortCodeGenerator>();
     }
 }
