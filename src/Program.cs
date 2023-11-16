@@ -1,5 +1,5 @@
 WebApplication.CreateBuilder(args)
-              .BuildIt()
+              .BuildIt<IShortenerAssemblyMarker>()
               .MapEndpoints()
               .Run();
 
